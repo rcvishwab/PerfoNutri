@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SPLIT — Fuel your training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171A;
+    --surface:#1D2124;
+    --surface-2:#262B2F;
+    --paper:#F0F1ED;
+    --line:#33393E;
+    --muted:#8A9099;
+    --signal:#FF4E1F;
+    --signal-dim:#7A2A15;
+    --teal:#0B6E63;
+    --amber:#E8A317;
+    --white:#FFFFFF;
+    --radius-lg:22px;
+    --radius-md:14px;
+    --radius-sm:9px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#0B0C0D;
+    font-family:'Work Sans',sans-serif;
+    color:var(--paper);
+    display:flex;
+    justify-content:center;
+    min-height:100vh;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  /* ---------- Phone frame ---------- */
+  .device{
+    width:100%;
+    max-width:430px;
+    min-height:100vh;
+    background:var(--ink);
+    position:relative;
+    overflow-x:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .statusbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 22px 4px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:0.03em;
+  }
+  .statusbar .dot-row span{display:inline-block;width:3px;height:3px;background:var(--paper);border-radius:50%;margin-left:3px;}
+
+  .screen{ display:none; flex:1; flex-direction:column; animation:riseIn .5s ease both; }
+  .screen.active{ display:flex; }
+  @keyframes riseIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---------- Auth screen ---------- */
+  .auth-wrap{ flex:1; display:flex; flex-direction:column; padding:36px 26px 30px; }
+  .brand{ margin-bottom:auto; }
+  .brand-mark{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:15px;
+    letter-spacing:0.32em;
+    color:var(--signal);
+    margin:0 0 34px;
+  }
+  .headline{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:58px;
+    line-height:0.92;
+    letter-spacing:0.01em;
+    margin:0 0 14px;
+  }
+  .headline em{ font-style:normal; color:var(--signal); }
+  .sub{
+    font-size:15px;
+    line-height:1.5;
+    color:var(--muted);
+    max-width:32ch;
+    margin:0 0 40px;
+  }
+
+  .method-toggle{
+    display:flex;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:4px;
+    margin-bottom:18px;
+  }
+  .method-toggle button{
+    flex:1;
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-family:'Work Sans',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.04em;
+    padding:11px 0;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .25s ease, color .25s ease;
+  }
+  .method-toggle button.active{ background:var(--signal); color:var(--white); }
+
+  .field{
+    display:flex;
+    align-items:center;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:0 16px;
+    margin-bottom:14px;
+    transition:border-color .2s ease;
+  }
+  .field:focus-within{ border-color:var(--signal); }
+  .field .prefix{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    color:var(--muted);
+    padding-right:10px;
+    border-right:1px solid var(--line);
+    margin-right:10px;
+  }
+  .field input{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:var(--paper);
+    font-family:'Work Sans',sans-serif;
+    font-size:15px;
+    padding:15px 0;
+  }
+  .field input::placeholder{ color:#5C6268; }
+
+  .btn-primary{
+    width:100%;
+    background:var(--signal);
+    color:var(--white);
+    border:none;
+    border-radius:var(--radius-md);
+    padding:16px 0;
+    font-family:'Work Sans',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    margin-top:6px;
+    transition:transform .15s ease, background .2s ease;
+  }
+  .btn-primary:hover{ background:#FF6B3D; }
+  .btn-primary:active{ transform:scale(0.98); }
+  .btn-primary:disabled{ background:var(--signal-dim); cursor:not-allowed; }
+
+  .guest-link{
+    text-align:center;
+    margin-top:22px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .guest-link button{
+    background:none; border:none; color:var(--paper); font-weight:600;
+    text-decoration:underline; cursor:pointer; font-size:13px; font-family:inherit;
+  }
+  .fine-print{ font-size:11px; color:#5C6268; margin-top:24px; line-height:1.6; }
+
+  .back-row{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:26px; cursor:pointer; color:var(--muted); font-size:13px;
+    width:fit-content;
+  }
+  .back-row svg{ width:16px; height:16px; }
+
+  .otp-row{ display:flex; gap:10px; margin-bottom:22px; }
+  .otp-row.shake{ animation:shake .4s ease; }
+  @keyframes shake{
+    10%,90%{ transform:translateX(-2px); }
+    20%,80%{ transform:translateX(4px); }
+    30%,50%,70%{ transform:translateX(-8px); }
+    40%,60%{ transform:translateX(8px); }
+  }
+  .otp-row input{
+    width:100%; aspect-ratio:1; text-align:center;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm);
+    color:var(--paper); font-family:'JetBrains Mono',monospace; font-size:22px;
+    outline:none; transition:border-color .2s ease;
+  }
+  .otp-row input:focus{ border-color:var(--signal); }
+  .otp-row.error input{ border-color:var(--signal); }
+  .otp-error{
+    font-size:12.5px; color:var(--signal); margin:-12px 0 18px; min-height:16px;
+  }
+  .dev-otp-banner{
+    display:none;
+    background:rgba(11,110,99,0.14);
+    border:1px dashed var(--teal);
+    border-radius:var(--radius-sm);
+    padding:11px 14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--paper);
+    line-height:1.5;
+    margin-bottom:18px;
+  }
+  .dev-otp-banner strong{ color:var(--teal); letter-spacing:0.08em; }
+  .dev-otp-banner .code{ font-size:20px; font-weight:700; color:var(--paper); letter-spacing:0.15em; }
+  .resend{ font-size:13px; color:var(--muted); text-align:center; }
+  .resend button{ background:none;border:none;color:var(--signal);font-weight:600;cursor:pointer;font-size:13px;font-family:inherit; }
+  .resend button:disabled{ color:var(--muted); cursor:not-allowed; text-decoration:none; }
+
+  /* ---------- Menu screen ---------- */
+  .menu-header{
+    padding:18px 22px 0;
+  }
+  .greet-row{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; }
+  .greet-row .eyebrow{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; }
+  .greet-row h1{ font-family:'Bebas Neue',sans-serif; font-size:34px; margin:2px 0 0; letter-spacing:0.01em; }
+  .header-icons{ display:flex; align-items:center; gap:10px; }
+  .profile-btn{
+    width:46px; height:46px; border-radius:50%; cursor:pointer;
+    background:var(--surface); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .2s ease;
+  }
+  .profile-btn:hover{ border-color:var(--signal); }
+  .profile-btn svg{ width:20px; height:20px; stroke:var(--paper); }
+
+  .cart-btn{ cursor:pointer;
+    position:relative; width:46px; height:46px; border-radius:50%;
+    background:var(--surface); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cart-btn svg{ width:20px; height:20px; stroke:var(--paper); }
+  .cart-badge{
+    position:absolute; top:-4px; right:-4px; background:var(--signal); color:var(--white);
+    font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
+    min-width:18px; height:18px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+  }
+
+  /* Scoreboard strip — signature element */
+  .scoreboard{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:16px 18px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .scoreboard::before{
+    content:"TODAY'S SPLIT";
+    position:absolute; top:8px; left:18px;
+    font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.18em; color:#4A5056;
+  }
+  .score-cell{ text-align:center; padding-top:14px; }
+  .score-cell .val{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:20px;
+    color:var(--signal); text-shadow:0 0 14px rgba(255,78,31,0.35);
+  }
+  .score-cell:nth-child(2) .val{ color:var(--amber); text-shadow:0 0 14px rgba(232,163,23,0.3); }
+  .score-cell:nth-child(3) .val{ color:var(--teal); text-shadow:0 0 14px rgba(11,110,99,0.4); }
+  .score-cell:nth-child(4) .val{ color:var(--paper); text-shadow:none; }
+  .score-cell .lbl{ font-size:9px; letter-spacing:0.1em; color:var(--muted); margin-top:3px; text-transform:uppercase; }
+
+  .filters{
+    display:flex; gap:8px; overflow-x:auto; padding:0 22px 16px;
+    scrollbar-width:none;
+  }
+  .filters::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex:none; padding:9px 16px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); color:var(--muted); font-size:12px; font-weight:600;
+    letter-spacing:0.03em; white-space:nowrap; cursor:pointer; transition:all .2s ease;
+  }
+  .chip.active{ background:var(--paper); color:var(--ink); border-color:var(--paper); }
+
+  .meal-list{ padding:0 22px 110px; display:flex; flex-direction:column; gap:14px; }
+  .meal-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:16px;
+    display:grid;
+    grid-template-columns:84px 1fr;
+    gap:14px;
+    animation:riseIn .5s ease both;
+  }
+  .meal-thumb{
+    width:84px; height:84px; border-radius:var(--radius-md);
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px;
+  }
+  .meal-info h3{ margin:0 0 3px; font-size:15px; font-weight:700; }
+  .meal-tag{
+    font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.1em;
+    color:var(--signal); text-transform:uppercase; margin-bottom:6px; display:block;
+  }
+  .meal-desc{ font-size:12.5px; color:var(--muted); line-height:1.45; margin:0 0 10px; }
+  .meal-foot{ display:flex; align-items:center; justify-content:space-between; }
+  .price{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:15px; }
+  .add-btn{
+    width:34px; height:34px; border-radius:50%; border:none;
+    background:var(--signal); color:var(--white); font-size:18px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:transform .15s ease;
+  }
+  .add-btn:active{ transform:scale(0.88); }
+
+  .rings-row{ display:flex; gap:14px; margin-bottom:10px; align-items:center; }
+  .ring-wrap{ position:relative; width:46px; height:46px; }
+  .ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .ring-wrap circle{ fill:none; stroke-width:5; }
+  .ring-wrap .bg{ stroke:var(--line); }
+  .ring-wrap .fg{ stroke-linecap:round; transition:stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1); }
+  .macro-legend{ display:flex; flex-direction:column; gap:3px; font-family:'JetBrains Mono',monospace; font-size:10.5px; }
+  .macro-legend .row{ display:flex; gap:6px; align-items:center; color:var(--muted); }
+  .macro-legend .swatch{ width:7px; height:7px; border-radius:2px; }
+
+  /* Bottom nav */
+  .bottom-nav{
+    position:sticky; bottom:0; left:0; right:0;
+    background:rgba(20,23,26,0.92);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);
+    display:flex; justify-content:space-around; padding:12px 0 18px;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:var(--muted); font-size:10px; letter-spacing:0.05em; cursor:pointer;
+    background:none; border:none; font-family:'Work Sans',sans-serif;
+  }
+  .nav-item svg{ width:20px; height:20px; stroke:var(--muted); fill:none; stroke-width:1.6; }
+  .nav-item.active{ color:var(--paper); }
+  .nav-item.active svg{ stroke:var(--signal); }
+
+  ::selection{ background:var(--signal); color:var(--white); }
+  a{ color:inherit; }
+
+  /* ---------- Cart drawer ---------- */
+  .cart-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.55);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .25s ease;
+    z-index:50;
+  }
+  .cart-overlay.open{ opacity:1; pointer-events:auto; }
+  .cart-drawer{
+    width:100%; max-width:430px; max-height:78vh;
+    background:var(--ink); border:1px solid var(--line); border-bottom:none;
+    border-radius:24px 24px 0 0;
+    display:flex; flex-direction:column;
+    transform:translateY(100%); transition:transform .3s cubic-bezier(.22,1,.36,1);
+    padding-bottom:env(safe-area-inset-bottom, 0);
+  }
+  .cart-overlay.open .cart-drawer{ transform:translateY(0); }
+  .cart-drawer-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 22px 12px; border-bottom:1px solid var(--line);
+  }
+  .cart-drawer-head h2{ font-family:'Bebas Neue',sans-serif; font-size:26px; margin:0; letter-spacing:0.01em; }
+  .cart-close{
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--line);
+    background:var(--surface); color:var(--paper); cursor:pointer; font-size:14px;
+  }
+  .cart-items{ overflow-y:auto; padding:14px 22px; flex:1; display:flex; flex-direction:column; gap:12px; }
+  .cart-empty{ text-align:center; color:var(--muted); font-size:13px; padding:40px 0; }
+  .cart-line{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:12px 14px;
+  }
+  .cart-line-name{ font-size:13.5px; font-weight:600; margin:0 0 3px; }
+  .cart-line-meta{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); }
+  .cart-qty{ display:flex; align-items:center; gap:10px; }
+  .cart-qty button{
+    width:26px; height:26px; border-radius:50%; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--paper); cursor:pointer; font-size:14px; line-height:1;
+  }
+  .cart-qty span{ font-family:'JetBrains Mono',monospace; font-size:13px; min-width:14px; text-align:center; }
+  .cart-address{ padding:16px 22px 4px; }
+  .cart-address-label{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.14em;
+    color:var(--muted); text-transform:uppercase; margin:0 0 10px;
+  }
+  .address-empty{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    border:1px dashed var(--line); border-radius:var(--radius-md);
+    padding:20px 16px; text-align:center;
+  }
+  .address-empty p{ font-size:12.5px; color:var(--muted); margin:0; }
+  .address-list{ display:flex; flex-direction:column; gap:8px; }
+  .address-option{
+    display:flex; align-items:flex-start; gap:12px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:12px 14px; cursor:pointer; transition:border-color .2s ease, background .2s ease;
+  }
+  .address-option:hover{ border-color:#4A5056; }
+  .address-option.selected{ border-color:var(--signal); background:rgba(255,78,31,0.08); }
+  .address-option-icon{ font-size:17px; width:24px; text-align:center; flex:none; margin-top:1px; }
+  .address-option-text{ flex:1; min-width:0; }
+  .address-option-label{ font-size:13px; font-weight:700; margin:0; letter-spacing:0.02em; }
+  .address-option-detail{ font-size:12px; color:var(--muted); margin:3px 0 0; line-height:1.4; }
+  .address-option-radio{
+    width:18px; height:18px; border-radius:50%; border:1.5px solid var(--line);
+    flex:none; margin-top:2px; position:relative; transition:border-color .2s ease;
+  }
+  .address-option.selected .address-option-radio{ border-color:var(--signal); }
+  .address-option.selected .address-option-radio::after{
+    content:""; position:absolute; inset:3px; border-radius:50%; background:var(--signal);
+  }
+  .add-address-btn{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    width:100%; background:transparent; border:1px dashed var(--line); border-radius:var(--radius-md);
+    color:var(--paper); font-family:'Work Sans',sans-serif; font-weight:600; font-size:12.5px;
+    padding:11px 0; cursor:pointer; margin-top:8px; transition:border-color .2s ease;
+  }
+  .add-address-btn:hover{ border-color:var(--signal); color:var(--signal); }
+
+  .address-form{
+    display:flex; flex-direction:column; gap:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:14px; margin-top:8px;
+  }
+  .address-form .field{ margin-bottom:0; padding:0 14px; }
+  .address-form .field input{ padding:12px 0; font-size:13.5px; }
+  .field-row{ display:flex; gap:8px; }
+  .field-row .field{ flex:1; }
+  .label-chip-row{ display:flex; gap:8px; }
+  .label-chip{
+    flex:1; text-align:center; padding:9px 0; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--muted); font-size:12px; font-weight:600; cursor:pointer;
+    transition:all .2s ease;
+  }
+  .label-chip.selected{ background:var(--signal); color:var(--white); border-color:var(--signal); }
+  .address-form-actions{ display:flex; gap:8px; margin-top:2px; }
+  .address-form-actions .btn-primary{ margin-top:0; padding:12px 0; font-size:13px; }
+  .btn-secondary{
+    flex:none; background:transparent; border:1px solid var(--line); color:var(--muted);
+    border-radius:var(--radius-md); padding:12px 18px; font-size:13px; font-weight:600;
+    cursor:pointer; font-family:'Work Sans',sans-serif;
+  }
+  .address-error{ font-size:12px; color:var(--signal); margin:0; min-height:14px; }
+
+  .profile-body{ padding:20px 22px 26px; overflow-y:auto; flex:1; }
+  .profile-avatar-row{ display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .profile-avatar{
+    width:56px; height:56px; border-radius:50%; flex:none;
+    background:linear-gradient(135deg, var(--signal), #B5341A);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--white);
+  }
+  .profile-name{ font-size:16px; font-weight:700; margin:0; }
+  .profile-contact{ font-size:12.5px; color:var(--muted); margin:3px 0 0; font-family:'JetBrains Mono',monospace; }
+  .profile-stats{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px;
+  }
+  .profile-stat{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:12px 14px; text-align:center;
+  }
+  .profile-stat .val{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:20px; color:var(--signal); }
+  .profile-stat .lbl{ font-size:10.5px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:3px; }
+  .profile-section-label{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.14em;
+    color:var(--muted); text-transform:uppercase; margin:0 0 10px;
+  }
+  .profile-address-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:22px; }
+  .profile-address-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:11px 14px; display:flex; gap:10px; align-items:flex-start;
+  }
+  .profile-address-card .icon{ font-size:16px; }
+  .profile-address-card .lbl{ font-size:12.5px; font-weight:700; margin:0; }
+  .profile-address-card .detail{ font-size:11.5px; color:var(--muted); margin:2px 0 0; line-height:1.4; }
+  .profile-empty-note{ font-size:12px; color:var(--muted); margin:0 0 22px; }
+  .profile-guest-card{
+    text-align:center; border:1px dashed var(--line); border-radius:var(--radius-md);
+    padding:24px 16px; margin-bottom:20px;
+  }
+  .profile-guest-card p{ font-size:13px; color:var(--muted); margin:0 0 16px; }
+
+  /* ---------- Admin dashboard ---------- */
+  .admin-meal-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg);
+    padding:14px 16px; display:flex; gap:12px; align-items:flex-start; margin-bottom:12px;
+  }
+  .admin-meal-card .thumb{
+    width:44px; height:44px; border-radius:var(--radius-sm); flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+  }
+  .admin-meal-card .info{ flex:1; min-width:0; }
+  .admin-meal-card .info h4{ margin:0 0 2px; font-size:14px; }
+  .admin-meal-card .info .meta{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); }
+  .admin-meal-card .actions{ display:flex; flex-direction:column; gap:6px; }
+  .admin-meal-card .actions button{
+    border:none; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:700; cursor:pointer;
+    font-family:'Work Sans',sans-serif;
+  }
+  .btn-del{ background:rgba(255,78,31,0.14); color:var(--signal); }
+  .btn-edit{ background:var(--surface-2); color:var(--paper); }
+
+  .item-form{
+    display:flex; flex-direction:column; gap:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:14px; margin:10px 0 18px;
+  }
+  .item-form .field{ margin-bottom:0; padding:0 14px; }
+  .item-form .field input, .item-form .field textarea{ padding:12px 0; font-size:13.5px; background:transparent; border:none; outline:none; color:var(--paper); font-family:'Work Sans',sans-serif; width:100%; }
+  .item-form textarea{ resize:vertical; min-height:44px; }
+
+  .admin-order-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg);
+    padding:14px 16px; margin-bottom:12px;
+  }
+  .admin-order-card .order-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .admin-order-card .order-id{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px; }
+  .admin-order-card .order-time{ font-size:11px; color:var(--muted); }
+  .admin-order-card .order-line{ font-size:12.5px; color:var(--paper); margin:3px 0; }
+  .admin-order-card .order-meta{ font-size:11.5px; color:var(--muted); margin-top:6px; line-height:1.5; }
+  .admin-order-card .order-total{ font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--signal); }
+  .admin-empty{ text-align:center; color:var(--muted); font-size:13px; padding:40px 0; }
+
+  .cart-payment{ padding:14px 22px 4px; border-top:1px solid var(--line); }
+  .cart-payment-label{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.14em;
+    color:var(--muted); text-transform:uppercase; margin:0 0 10px;
+  }
+  .payment-list{ display:flex; flex-direction:column; gap:8px; }
+  .payment-option{
+    display:flex; align-items:center; gap:12px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:11px 14px; cursor:pointer; transition:border-color .2s ease, background .2s ease;
+  }
+  .payment-option:hover{ border-color:#4A5056; }
+  .payment-option.selected{ border-color:var(--signal); background:rgba(255,78,31,0.08); }
+  .payment-option-icon{ font-size:18px; width:26px; text-align:center; flex:none; }
+  .payment-option-text{ flex:1; min-width:0; }
+  .payment-option-name{ font-size:13.5px; font-weight:600; margin:0; }
+  .payment-option-sub{ font-size:11px; color:var(--muted); margin:2px 0 0; }
+  .payment-option-radio{
+    width:18px; height:18px; border-radius:50%; border:1.5px solid var(--line);
+    flex:none; position:relative; transition:border-color .2s ease;
+  }
+  .payment-option.selected .payment-option-radio{ border-color:var(--signal); }
+  .payment-option.selected .payment-option-radio::after{
+    content:""; position:absolute; inset:3px; border-radius:50%; background:var(--signal);
+  }
+  .payment-error{ font-size:12px; color:var(--signal); margin:8px 0 0; min-height:14px; }
+
+  .cart-summary{ padding:16px 22px 22px; border-top:1px solid var(--line); }
+  .cart-total-row{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:17px;
+    margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="dot-row"><span></span><span></span><span></span></span>
+  </div>
+
+  <!-- ================= AUTH — METHOD CHOICE ================= -->
+  <section class="screen active" id="screen-auth">
+    <div class="auth-wrap">
+      <div class="brand">
+        <p class="brand-mark">SPLIT · PERFORMANCE KITCHEN</p>
+        <h1 class="headline">Fuel every<br><em>split.</em></h1>
+        <p class="sub">Macro-built meals, timed to your training. Sign in to set your plate.</p>
+      </div>
+
+      <div class="method-toggle">
+        <button type="button" class="active" id="tab-phone">Phone</button>
+        <button type="button" id="tab-email">Email</button>
+      </div>
+
+      <div id="field-phone" class="field">
+        <span class="prefix">+91</span>
+        <input type="tel" inputmode="numeric" maxlength="10" placeholder="98765 43210" id="input-phone">
+      </div>
+
+      <div id="field-email" class="field" style="display:none;">
+        <input type="email" placeholder="you@trainingcamp.in" id="input-email">
+      </div>
+
+      <button class="btn-primary" id="btn-continue">Continue</button>
+
+      <p class="guest-link">or <button type="button" id="btn-guest">browse the menu as a guest</button></p>
+      <p class="fine-print">We'll send a 4-digit OTP by SMS or email to confirm it's you. Standard SMS rates may apply.</p>
+      <p class="fine-print" style="text-align:center; margin-top:10px;">Restaurant staff? <button type="button" id="btn-admin-link" style="background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:11px;font-family:inherit;">Admin sign in</button></p>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN — LOGIN ================= -->
+  <section class="screen" id="screen-admin-login">
+    <div class="auth-wrap">
+      <div class="back-row" id="btn-back-from-admin-login">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </div>
+      <div class="brand">
+        <p class="brand-mark">SPLIT · ADMIN</p>
+        <h1 class="headline" style="font-size:44px;">Kitchen<br><em>console.</em></h1>
+        <p class="sub">Manage the live menu and see incoming orders.</p>
+      </div>
+
+      <div class="field">
+        <input type="text" id="admin-username" placeholder="Admin username">
+      </div>
+      <div class="field">
+        <input type="password" id="admin-password" placeholder="Password">
+      </div>
+      <p class="address-error" id="admin-login-error"></p>
+      <button class="btn-primary" id="btn-admin-login">Sign in</button>
+      <div class="dev-otp-banner" style="display:block; margin-top:18px;">
+        <strong>DEMO CREDENTIALS</strong><br>
+        Username: <span class="code" style="font-size:14px;">admin</span> &nbsp; Password: <span class="code" style="font-size:14px;">admin123</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN — DASHBOARD ================= -->
+  <section class="screen" id="screen-admin">
+    <div class="menu-header">
+      <div class="greet-row">
+        <div>
+          <span class="eyebrow">Kitchen console</span>
+          <h1>Admin</h1>
+        </div>
+        <div class="header-icons">
+          <button type="button" class="btn-secondary" id="btn-admin-logout" style="padding:10px 16px; font-size:12px;">Log out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="filters" id="admin-tabs">
+      <button class="chip active" data-tab="menu">Menu</button>
+      <button class="chip" data-tab="orders">Orders <span class="cart-badge" id="admin-order-badge" style="position:static; display:none; margin-left:5px;">0</span></button>
+    </div>
+
+    <div id="admin-menu-tab" class="meal-list" style="padding-bottom:40px;">
+      <button type="button" class="add-address-btn" id="btn-open-add-item">+ Add menu item</button>
+      <div id="admin-item-form-slot"></div>
+      <div id="admin-meal-list"></div>
+    </div>
+
+    <div id="admin-orders-tab" class="meal-list" style="padding-bottom:40px; display:none;">
+      <div id="admin-orders-list"></div>
+    </div>
+  </section>
+
+  <!-- ================= AUTH — VERIFY CODE ================= -->
+  <section class="screen" id="screen-verify">
+    <div class="auth-wrap">
+      <div class="back-row" id="btn-back-auth">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </div>
+      <p class="brand-mark">VERIFY IT'S YOU</p>
+      <h1 class="headline" style="font-size:42px;">Enter your<br><em>OTP.</em></h1>
+      <p class="sub" id="verify-sub">We sent a 4-digit OTP to your mobile number.</p>
+
+      <div class="dev-otp-banner" id="dev-otp-banner"></div>
+
+      <div class="otp-row" id="otp-row">
+        <input maxlength="1" inputmode="numeric" class="otp-digit">
+        <input maxlength="1" inputmode="numeric" class="otp-digit">
+        <input maxlength="1" inputmode="numeric" class="otp-digit">
+        <input maxlength="1" inputmode="numeric" class="otp-digit">
+      </div>
+      <p class="otp-error" id="otp-error"></p>
+
+      <button class="btn-primary" id="btn-verify">Verify &amp; sign in</button>
+      <p class="resend">Didn't get it? <button type="button" id="btn-resend">Resend code</button></p>
+    </div>
+  </section>
+
+  <!-- ================= MENU ================= -->
+  <section class="screen" id="screen-menu">
+    <div class="menu-header">
+      <div class="greet-row">
+        <div>
+          <span class="eyebrow" id="menu-date">Today's plate</span>
+          <h1>Ready to eat</h1>
+        </div>
+        <div class="header-icons">
+          <div class="profile-btn" id="profile-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+          </div>
+          <div class="cart-btn" id="cart-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+            <span class="cart-badge" id="cart-count">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="scoreboard">
+        <div class="score-cell"><div class="val" id="tot-protein">0g</div><div class="lbl">Protein</div></div>
+        <div class="score-cell"><div class="val" id="tot-carb">0g</div><div class="lbl">Carbs</div></div>
+        <div class="score-cell"><div class="val" id="tot-fat">0g</div><div class="lbl">Fat</div></div>
+        <div class="score-cell"><div class="val" id="tot-kcal">0</div><div class="lbl">Kcal</div></div>
+      </div>
+    </div>
+
+    <div class="filters" id="filters"></div>
+    <div class="meal-list" id="meal-list"></div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active">
+        <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        Home
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M4 3v18M4 3c3 0 3 4 0 4M20 3v7a2 2 0 0 1-2 2 2 2 0 0 1-2-2V3M18 12v9"/></svg>
+        Menu
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M5 3h14v18l-7-4-7 4V3z"/></svg>
+        Orders
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        Profile
+      </button>
+    </nav>
+
+    <!-- Cart drawer -->
+    <div class="cart-overlay" id="cart-overlay">
+      <div class="cart-drawer">
+        <div class="cart-drawer-head">
+          <h2>Your cart</h2>
+          <button class="cart-close" id="cart-close" aria-label="Close cart">✕</button>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-address">
+          <p class="cart-address-label">Deliver to</p>
+          <div id="address-body"></div>
+        </div>
+        <div class="cart-payment">
+          <p class="cart-payment-label">Payment method</p>
+          <div class="payment-list" id="payment-list"></div>
+          <p class="payment-error" id="payment-error"></p>
+        </div>
+        <div class="cart-summary">
+          <div class="cart-total-row">
+            <span>Total</span>
+            <span id="cart-total">₹0</span>
+          </div>
+          <button class="btn-primary" id="cart-checkout">Checkout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile drawer -->
+    <div class="cart-overlay" id="profile-overlay">
+      <div class="cart-drawer">
+        <div class="cart-drawer-head">
+          <h2>Profile</h2>
+          <button class="cart-close" id="profile-close" aria-label="Close profile">✕</button>
+        </div>
+        <div class="profile-body" id="profile-body"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  // ---------- Screen navigation ----------
+  const screens = {
+    auth: document.getElementById('screen-auth'),
+    verify: document.getElementById('screen-verify'),
+    menu: document.getElementById('screen-menu'),
+    adminLogin: document.getElementById('screen-admin-login'),
+    admin: document.getElementById('screen-admin'),
+  };
+  function show(name){
+    Object.values(screens).forEach(s=>s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  // ---------- Auth method toggle ----------
+  const tabPhone = document.getElementById('tab-phone');
+  const tabEmail = document.getElementById('tab-email');
+  const fieldPhone = document.getElementById('field-phone');
+  const fieldEmail = document.getElementById('field-email');
+  let method = 'phone';
+
+  tabPhone.addEventListener('click', ()=>{
+    method = 'phone';
+    tabPhone.classList.add('active'); tabEmail.classList.remove('active');
+    fieldPhone.style.display='flex'; fieldEmail.style.display='none';
+  });
+  tabEmail.addEventListener('click', ()=>{
+    method = 'email';
+    tabEmail.classList.add('active'); tabPhone.classList.remove('active');
+    fieldEmail.style.display='flex'; fieldPhone.style.display='none';
+  });
+
+  // ---------- Continue -> verify ----------
+  let currentCode = null;
+  let codeExpiresAt = null;
+  let resendTimer = null;
+  let customerPhone = '';
+  let customerEmail = '';
+  const EXPIRY_SECONDS = 60;
+  const RESEND_COOLDOWN = 30;
+
+  function generateCode(){
+    currentCode = String(Math.floor(1000 + Math.random()*9000)); // 4-digit
+    codeExpiresAt = Date.now() + EXPIRY_SECONDS*1000;
+    return currentCode;
+  }
+
+  function showDevBanner(destination){
+    const banner = document.getElementById('dev-otp-banner');
+    banner.style.display = 'block';
+    banner.innerHTML = `<strong>DEV MODE — no real SMS/email is sent.</strong><br>
+      Your OTP for ${destination}: <span class="code">${currentCode}</span>
+      <br>Expires in ${EXPIRY_SECONDS}s.`;
+  }
+
+  function startResendCooldown(){
+    const btn = document.getElementById('btn-resend');
+    let secondsLeft = RESEND_COOLDOWN;
+    btn.disabled = true;
+    btn.textContent = `Resend in ${secondsLeft}s`;
+    clearInterval(resendTimer);
+    resendTimer = setInterval(()=>{
+      secondsLeft -= 1;
+      if(secondsLeft <= 0){
+        clearInterval(resendTimer);
+        btn.disabled = false;
+        btn.textContent = 'Resend code';
+      } else {
+        btn.textContent = `Resend in ${secondsLeft}s`;
+      }
+    }, 1000);
+  }
+
+  document.getElementById('btn-continue').addEventListener('click', ()=>{
+    const val = method === 'phone'
+      ? document.getElementById('input-phone').value.trim()
+      : document.getElementById('input-email').value.trim();
+    if(!val){
+      const target = method === 'phone' ? document.getElementById('input-phone') : document.getElementById('input-email');
+      target.style.borderColor = '#FF4E1F';
+      target.focus();
+      return;
+    }
+    if(method === 'phone' && val.replace(/\D/g,'').length !== 10){
+      const target = document.getElementById('input-phone');
+      target.style.borderColor = '#FF4E1F';
+      target.focus();
+      return;
+    }
+    const destination = method === 'phone' ? '+91 ' + val : val;
+    if(method === 'phone') customerPhone = val.replace(/\D/g,''); else customerEmail = val;
+    document.getElementById('verify-sub').textContent = 'We sent a 4-digit OTP to ' + destination;
+    generateCode();
+    show('verify');
+    otpInputs.forEach(i => i.value = '');
+    document.getElementById('otp-error').textContent = '';
+    document.getElementById('otp-row').classList.remove('error');
+    showDevBanner(destination);
+    startResendCooldown();
+    otpInputs[0].focus();
+  });
+
+  document.getElementById('btn-back-auth').addEventListener('click', ()=>{
+    clearInterval(resendTimer);
+    document.getElementById('dev-otp-banner').style.display = 'none';
+    show('auth');
+  });
+  document.getElementById('btn-guest').addEventListener('click', ()=> enterMenu());
+  document.getElementById('btn-resend').addEventListener('click', (e)=>{
+    if(e.target.disabled) return;
+    generateCode();
+    const destination = document.getElementById('verify-sub').textContent.replace('We sent a 4-digit OTP to ', '');
+    showDevBanner(destination);
+    startResendCooldown();
+    otpInputs.forEach(i => i.value = '');
+    otpInputs[0].focus();
+    document.getElementById('otp-error').textContent = '';
+    document.getElementById('otp-row').classList.remove('error');
+  });
+
+  // OTP auto-advance
+  const otpInputs = Array.from(document.querySelectorAll('.otp-digit'));
+  otpInputs.forEach((inp, i)=>{
+    inp.addEventListener('input', ()=>{
+      inp.value = inp.value.replace(/[^0-9]/g,'');
+      if(inp.value && otpInputs[i+1]) otpInputs[i+1].focus();
+    });
+    inp.addEventListener('keydown', (e)=>{
+      if(e.key === 'Backspace' && !inp.value && otpInputs[i-1]) otpInputs[i-1].focus();
+      if(e.key === 'Enter') document.getElementById('btn-verify').click();
+    });
+  });
+
+  document.getElementById('btn-verify').addEventListener('click', ()=>{
+    const entered = otpInputs.map(i => i.value).join('');
+    const otpRow = document.getElementById('otp-row');
+    const errorEl = document.getElementById('otp-error');
+
+    if(entered.length < 4){
+      errorEl.textContent = 'Enter all 4 digits.';
+      otpRow.classList.add('shake');
+      setTimeout(()=> otpRow.classList.remove('shake'), 400);
+      return;
+    }
+    if(Date.now() > codeExpiresAt){
+      errorEl.textContent = 'This code expired. Tap resend to get a new one.';
+      otpRow.classList.add('shake');
+      setTimeout(()=> otpRow.classList.remove('shake'), 400);
+      return;
+    }
+    if(entered !== currentCode){
+      errorEl.textContent = 'Incorrect code. Check the digits and try again.';
+      otpRow.classList.add('error', 'shake');
+      setTimeout(()=> otpRow.classList.remove('shake'), 400);
+      otpInputs.forEach(i => i.value = '');
+      otpInputs[0].focus();
+      return;
+    }
+    clearInterval(resendTimer);
+    enterMenu();
+  });
+
+  function enterMenu(){
+    show('menu');
+    renderMeals();
+    animateRings();
+  }
+
+  // ---------- Menu data ----------
+  // Shared storage lets admin menu edits and customer orders sync across
+  // everyone using this artifact. Falls back to in-memory-only if the
+  // storage API isn't available (e.g. when hosted as a plain static file).
+  const hasStorage = typeof window !== 'undefined' && !!window.storage;
+  const STORAGE_KEY_MEALS = 'split-menu-items';
+  const ORDER_KEY_PREFIX = 'split-order-';
+
+  const catMeta = {
+    post:       { label:'Post-Workout',  bg:'#3A2A1C' },
+    recovery:   { label:'Recovery',      bg:'#1C2E3A' },
+    endurance:  { label:'Endurance',     bg:'#2A3A1C' },
+    lowcarb:    { label:'Low-Carb',      bg:'#1C3A2E' },
+    protein:    { label:'High Protein',  bg:'#3A1C1C' },
+  };
+
+  const DEFAULT_MEALS = [
+    { id:1, name:'Sprinter\'s Tandoori Bowl', tag:'Post-Workout', emoji:'🍗', bg:'#3A2A1C',
+      desc:'Tandoori chicken, brown rice, sautéed lauki, mint chutney.',
+      protein:42, carb:48, fat:14, kcal:520, price:279, cat:'post' },
+    { id:2, name:'Kerala Fish Recovery Plate', tag:'Recovery', emoji:'🐟', bg:'#1C2E3A',
+      desc:'Pan-seared fish, ragi mudde, sautéed greens, curry-leaf tadka.',
+      protein:38, carb:40, fat:22, kcal:560, price:319, cat:'recovery' },
+    { id:3, name:'Rajma Power Wrap', tag:'Endurance', emoji:'🌯', bg:'#2A3A1C',
+      desc:'Whole-wheat roti, rajma, brown rice, pickled onion.',
+      protein:32, carb:56, fat:14, kcal:540, price:229, cat:'endurance' },
+    { id:4, name:'Paneer Circuit Salad', tag:'Low-Carb', emoji:'🥗', bg:'#1C3A2E',
+      desc:'Grilled paneer, sprouts, cucumber, lemon-jeera dressing.',
+      protein:30, carb:26, fat:16, kcal:360, price:249, cat:'lowcarb' },
+    { id:5, name:'Punjabi Power Plate', tag:'High Protein', emoji:'🍛', bg:'#3A1C1C',
+      desc:'Seekh kebab, dal makhani (light), jeera rice, salad.',
+      protein:45, carb:50, fat:18, kcal:600, price:349, cat:'protein' },
+    { id:6, name:'Millet Distance Bowl', tag:'Endurance', emoji:'🥣', bg:'#2A3A1C',
+      desc:'Foxtail millet khichdi, moong dal, ghee, roasted peanuts.',
+      protein:26, carb:62, fat:14, kcal:480, price:219, cat:'endurance' },
+    { id:7, name:'Idli-Sambar Refuel', tag:'Post-Workout', emoji:'🍚', bg:'#3A2A1C',
+      desc:'Steamed idli, sambar, coconut chutney, boiled egg whites.',
+      protein:34, carb:58, fat:10, kcal:460, price:199, cat:'post' },
+    { id:8, name:'Soya Chaap Endurance Bowl', tag:'Endurance', emoji:'🍢', bg:'#2A3A1C',
+      desc:'Tandoori soya chaap, quinoa pulao, curd, mint chutney.',
+      protein:36, carb:54, fat:15, kcal:510, price:259, cat:'endurance' },
+  ];
+
+  async function loadMeals(){
+    if(!hasStorage) return DEFAULT_MEALS.map(m => ({ ...m }));
+    try{
+      const res = await window.storage.get(STORAGE_KEY_MEALS, true);
+      if(res && res.value) return JSON.parse(res.value);
+    } catch(e){ /* key not set yet — use defaults */ }
+    return DEFAULT_MEALS.map(m => ({ ...m }));
+  }
+  async function saveMeals(){
+    if(!hasStorage) return;
+    try{ await window.storage.set(STORAGE_KEY_MEALS, JSON.stringify(meals), true); } catch(e){ /* storage unavailable */ }
+  }
+  async function loadAllOrders(){
+    if(!hasStorage) return [];
+    try{
+      const listRes = await window.storage.list(ORDER_KEY_PREFIX, true);
+      if(!listRes || !listRes.keys || listRes.keys.length === 0) return [];
+      const items = await Promise.all(listRes.keys.map(async key => {
+        try{
+          const r = await window.storage.get(key, true);
+          return r ? JSON.parse(r.value) : null;
+        } catch(e){ return null; }
+      }));
+      return items.filter(Boolean).sort((a,b) => b.placedAt - a.placedAt);
+    } catch(e){ return []; }
+  }
+  async function saveOrder(order){
+    if(!hasStorage) return;
+    try{ await window.storage.set(ORDER_KEY_PREFIX + order.id, JSON.stringify(order), true); } catch(e){ /* storage unavailable */ }
+  }
+
+  let meals = DEFAULT_MEALS.map(m => ({ ...m }));
+  let orders = [];
+  let nextMealId = meals.reduce((max,m) => Math.max(max, m.id), 0) + 1;
+  let unseenOrders = 0;
+  let lastMealsSnapshot = JSON.stringify(meals);
+
+  const filterDefs = [
+    { key:'all', label:'All' },
+    { key:'post', label:'Post-Workout' },
+    { key:'protein', label:'High Protein' },
+    { key:'endurance', label:'Endurance' },
+    { key:'lowcarb', label:'Low-Carb' },
+    { key:'recovery', label:'Recovery' },
+  ];
+  let activeFilter = 'all';
+  let cart = [];
+
+  const filtersEl = document.getElementById('filters');
+  filterDefs.forEach(f=>{
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (f.key==='all' ? ' active' : '');
+    chip.textContent = f.label;
+    chip.addEventListener('click', ()=>{
+      activeFilter = f.key;
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      renderMeals();
+      animateRings();
+    });
+    filtersEl.appendChild(chip);
+  });
+
+  // Macro targets used purely to size the rings (illustrative daily reference)
+  const TARGET = { protein:180, carb:280, fat:80 };
+
+  function ringSvg(meal){
+    const r = 18, c = 2*Math.PI*r;
+    function seg(color, pct){
+      const offset = c - (pct/100)*c;
+      return `<circle class="bg" cx="23" cy="23" r="${r}"/><circle class="fg" data-offset="${offset}" data-circumference="${c}" style="stroke-dashoffset:${c};stroke-dasharray:${c}" stroke="${color}" cx="23" cy="23" r="${r}"/>`;
+    }
+    const pPct = Math.min(100, Math.round(meal.protein/TARGET.protein*100));
+    return `
+      <div class="ring-wrap">
+        <svg viewBox="0 0 46 46">${seg('#FF4E1F', pPct)}</svg>
+      </div>`;
+  }
+
+  function renderMeals(){
+    const list = document.getElementById('meal-list');
+    list.innerHTML = '';
+    const filtered = meals.filter(m => activeFilter==='all' || m.cat===activeFilter);
+    filtered.forEach(m=>{
+      const card = document.createElement('div');
+      card.className = 'meal-card';
+      card.innerHTML = `
+        <div class="meal-thumb" style="background:${m.bg}">${m.emoji}</div>
+        <div class="meal-info">
+          <span class="meal-tag">${m.tag}</span>
+          <h3>${m.name}</h3>
+          <p class="meal-desc">${m.desc}</p>
+          <div class="rings-row">
+            ${ringSvg(m)}
+            <div class="macro-legend">
+              <div class="row"><span class="swatch" style="background:#FF4E1F"></span>P ${m.protein}g</div>
+              <div class="row"><span class="swatch" style="background:#E8A317"></span>C ${m.carb}g</div>
+              <div class="row"><span class="swatch" style="background:#0B6E63"></span>F ${m.fat}g</div>
+            </div>
+          </div>
+          <div class="meal-foot">
+            <span class="price">₹${m.price} · ${m.kcal} kcal</span>
+            <button class="add-btn" data-id="${m.id}">+</button>
+          </div>
+        </div>`;
+      list.appendChild(card);
+    });
+
+    list.querySelectorAll('.add-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const meal = meals.find(m=>m.id === Number(btn.dataset.id));
+        cart.push(meal);
+        updateScoreboard();
+        btn.textContent = '✓';
+        setTimeout(()=> btn.textContent = '+', 600);
+      });
+    });
+  }
+
+  function animateRings(){
+    requestAnimationFrame(()=>{
+      document.querySelectorAll('.ring-wrap .fg').forEach(el=>{
+        const circumference = el.dataset.circumference;
+        el.style.transition = 'none';
+        el.style.strokeDashoffset = circumference;
+        requestAnimationFrame(()=>{
+          el.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)';
+          el.style.strokeDashoffset = el.dataset.offset;
+        });
+      });
+    });
+  }
+
+  function updateScoreboard(){
+    const totals = cart.reduce((acc,m)=>{
+      acc.protein += m.protein; acc.carb += m.carb; acc.fat += m.fat; acc.kcal += m.kcal;
+      return acc;
+    }, {protein:0,carb:0,fat:0,kcal:0});
+    document.getElementById('tot-protein').textContent = totals.protein + 'g';
+    document.getElementById('tot-carb').textContent = totals.carb + 'g';
+    document.getElementById('tot-fat').textContent = totals.fat + 'g';
+    document.getElementById('tot-kcal').textContent = totals.kcal;
+    document.getElementById('cart-count').textContent = cart.length;
+    renderCartDrawer();
+  }
+
+  // ---------- Cart drawer ----------
+  const cartOverlay = document.getElementById('cart-overlay');
+
+  function openCart(){
+    renderCartDrawer();
+    cartOverlay.classList.add('open');
+  }
+  function closeCart(){
+    cartOverlay.classList.remove('open');
+  }
+
+  document.getElementById('cart-btn').addEventListener('click', openCart);
+  document.getElementById('cart-close').addEventListener('click', closeCart);
+  cartOverlay.addEventListener('click', (e)=>{
+    if(e.target === cartOverlay) closeCart();
+  });
+
+  // ---------- Profile drawer ----------
+  let completedOrders = 0;
+  const profileOverlay = document.getElementById('profile-overlay');
+
+  function openProfile(){
+    renderProfile();
+    profileOverlay.classList.add('open');
+  }
+  function closeProfile(){
+    profileOverlay.classList.remove('open');
+  }
+
+  document.getElementById('profile-btn').addEventListener('click', openProfile);
+  document.getElementById('profile-close').addEventListener('click', closeProfile);
+  profileOverlay.addEventListener('click', (e)=>{
+    if(e.target === profileOverlay) closeProfile();
+  });
+
+  function renderProfile(){
+    const body = document.getElementById('profile-body');
+    const isGuest = !customerPhone && !customerEmail;
+
+    if(isGuest){
+      body.innerHTML = `
+        <div class="profile-guest-card">
+          <p>You're browsing as a guest. Sign in to save addresses and track orders.</p>
+          <button type="button" class="btn-primary" id="profile-signin" style="margin-top:0;">Sign in</button>
+        </div>`;
+      document.getElementById('profile-signin').addEventListener('click', ()=>{
+        closeProfile();
+        show('auth');
+      });
+      return;
+    }
+
+    const contact = customerPhone ? ('+91 ' + customerPhone) : customerEmail;
+    const initial = (addresses[0]?.name?.[0] || contact[0] || 'A').toUpperCase();
+    const displayName = addresses.find(a => a.id === selectedAddressId)?.name || addresses[0]?.name || 'Athlete';
+
+    let addressHtml = '<p class="profile-empty-note">No saved addresses yet — add one from your cart at checkout.</p>';
+    if(addresses.length > 0){
+      addressHtml = `<div class="profile-address-list">${addresses.map(a => `
+        <div class="profile-address-card">
+          <span class="icon">${addressIcons[a.label] || '📍'}</span>
+          <div>
+            <p class="lbl">${a.label} · ${a.name}</p>
+            <p class="detail">${a.line1}${a.line2 ? ', '+a.line2 : ''}, ${a.city}, ${a.state} ${a.pincode}</p>
+          </div>
+        </div>`).join('')}</div>`;
+    }
+
+    body.innerHTML = `
+      <div class="profile-avatar-row">
+        <div class="profile-avatar">${initial}</div>
+        <div>
+          <p class="profile-name">${displayName}</p>
+          <p class="profile-contact">${contact}</p>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat"><div class="val">${completedOrders}</div><div class="lbl">Orders Placed</div></div>
+        <div class="profile-stat"><div class="val">${addresses.length}</div><div class="lbl">Saved Addresses</div></div>
+      </div>
+      <p class="profile-section-label">Saved addresses</p>
+      ${addressHtml}
+      <button type="button" class="btn-secondary" id="profile-signout" style="width:100%;">Sign out</button>
+    `;
+
+    document.getElementById('profile-signout').addEventListener('click', signOut);
+  }
+
+  function signOut(){
+    customerPhone = '';
+    customerEmail = '';
+    cart = [];
+    selectedPayment = null;
+    selectedAddressId = null;
+    addresses = [];
+    completedOrders = 0;
+    document.getElementById('input-phone').value = '';
+    document.getElementById('input-email').value = '';
+    closeProfile();
+    show('auth');
+  }
+
+  function groupedCart(){
+    const map = new Map();
+    cart.forEach(m=>{
+      if(!map.has(m.id)) map.set(m.id, { ...m, qty:0 });
+      map.get(m.id).qty += 1;
+    });
+    return Array.from(map.values());
+  }
+
+  function renderCartDrawer(){
+    const itemsEl = document.getElementById('cart-items');
+    const grouped = groupedCart();
+
+    if(grouped.length === 0){
+      itemsEl.innerHTML = '<p class="cart-empty">Your cart is empty. Add a meal to get started.</p>';
+    } else {
+      itemsEl.innerHTML = grouped.map(m => `
+        <div class="cart-line" data-id="${m.id}">
+          <div>
+            <p class="cart-line-name">${m.name}</p>
+            <span class="cart-line-meta">₹${m.price} each</span>
+          </div>
+          <div class="cart-qty">
+            <button class="cart-minus" data-id="${m.id}">−</button>
+            <span>${m.qty}</span>
+            <button class="cart-plus" data-id="${m.id}">+</button>
+          </div>
+        </div>`).join('');
+
+      itemsEl.querySelectorAll('.cart-plus').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const meal = meals.find(m=>m.id === Number(btn.dataset.id));
+          cart.push(meal);
+          updateScoreboard();
+        });
+      });
+      itemsEl.querySelectorAll('.cart-minus').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = Number(btn.dataset.id);
+          const idx = cart.findIndex(m=>m.id === id);
+          if(idx > -1) cart.splice(idx, 1);
+          updateScoreboard();
+        });
+      });
+    }
+
+    const total = grouped.reduce((sum,m)=> sum + m.price*m.qty, 0);
+    document.getElementById('cart-total').textContent = '₹' + total;
+
+    const checkoutBtn = document.getElementById('cart-checkout');
+    if(grouped.length === 0){
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = 'Add items to checkout';
+    } else if(!selectedAddressId){
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = 'Add a delivery address';
+    } else if(!selectedPayment){
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = 'Select a payment method';
+    } else {
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = 'Checkout';
+    }
+
+    renderAddressSection();
+    renderPaymentOptions();
+  }
+
+  // ---------- Delivery address ----------
+  let addresses = [];           // saved addresses for this session
+  let selectedAddressId = null;
+  let showAddressForm = false;
+  let addressFormLabel = 'Home';
+  let nextAddressId = 1;
+
+  const addressIcons = { Home:'🏠', Work:'🏢', Other:'📍' };
+
+  function renderAddressSection(){
+    const body = document.getElementById('address-body');
+
+    if(showAddressForm){
+      body.innerHTML = `
+        <div class="address-form">
+          <div class="label-chip-row">
+            ${['Home','Work','Other'].map(l => `<div class="label-chip${addressFormLabel===l?' selected':''}" data-label="${l}">${l}</div>`).join('')}
+          </div>
+          <div class="field"><input type="text" id="addr-name" placeholder="Full name"></div>
+          <div class="field-row">
+            <div class="field"><span class="prefix">+91</span><input type="tel" id="addr-phone" maxlength="10" placeholder="Mobile number" value="${customerPhone}"></div>
+          </div>
+          <div class="field"><input type="text" id="addr-line1" placeholder="Flat / House no., Building, Street"></div>
+          <div class="field"><input type="text" id="addr-line2" placeholder="Landmark (optional)"></div>
+          <div class="field-row">
+            <div class="field"><input type="text" id="addr-city" placeholder="City"></div>
+            <div class="field"><input type="text" id="addr-state" placeholder="State"></div>
+          </div>
+          <div class="field"><input type="text" id="addr-pincode" maxlength="6" placeholder="Pincode"></div>
+          <p class="address-error" id="address-error"></p>
+          <div class="address-form-actions">
+            ${addresses.length > 0 ? '<button type="button" class="btn-secondary" id="addr-cancel">Cancel</button>' : ''}
+            <button type="button" class="btn-primary" id="addr-save">Save address</button>
+          </div>
+        </div>`;
+
+      document.querySelectorAll('.label-chip').forEach(chip=>{
+        chip.addEventListener('click', ()=>{
+          addressFormLabel = chip.dataset.label;
+          document.querySelectorAll('.label-chip').forEach(c => c.classList.remove('selected'));
+          chip.classList.add('selected');
+        });
+      });
+      const cancelBtn = document.getElementById('addr-cancel');
+      if(cancelBtn) cancelBtn.addEventListener('click', ()=>{
+        showAddressForm = false;
+        renderAddressSection();
+      });
+      document.getElementById('addr-save').addEventListener('click', saveAddress);
+      return;
+    }
+
+    if(addresses.length === 0){
+      body.innerHTML = `
+        <div class="address-empty">
+          <span style="font-size:22px;">📍</span>
+          <p>No saved address yet. Add one to get your meals delivered.</p>
+          <button type="button" class="add-address-btn" id="addr-open-form">+ Add delivery address</button>
+        </div>`;
+      document.getElementById('addr-open-form').addEventListener('click', ()=>{
+        showAddressForm = true;
+        renderAddressSection();
+      });
+      return;
+    }
+
+    body.innerHTML = `
+      <div class="address-list">
+        ${addresses.map(a => `
+          <div class="address-option${selectedAddressId===a.id?' selected':''}" data-id="${a.id}">
+            <span class="address-option-icon">${addressIcons[a.label] || '📍'}</span>
+            <div class="address-option-text">
+              <p class="address-option-label">${a.label} · ${a.name}</p>
+              <p class="address-option-detail">${a.line1}${a.line2 ? ', '+a.line2 : ''}, ${a.city}, ${a.state} ${a.pincode}<br>+91 ${a.phone}</p>
+            </div>
+            <span class="address-option-radio"></span>
+          </div>`).join('')}
+      </div>
+      <button type="button" class="add-address-btn" id="addr-open-form">+ Add new address</button>`;
+
+    document.querySelectorAll('.address-option').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        selectedAddressId = Number(el.dataset.id);
+        renderCartDrawer();
+      });
+    });
+    document.getElementById('addr-open-form').addEventListener('click', ()=>{
+      showAddressForm = true;
+      renderAddressSection();
+    });
+  }
+
+  function saveAddress(){
+    const name = document.getElementById('addr-name').value.trim();
+    const phone = document.getElementById('addr-phone').value.trim();
+    const line1 = document.getElementById('addr-line1').value.trim();
+    const line2 = document.getElementById('addr-line2').value.trim();
+    const city = document.getElementById('addr-city').value.trim();
+    const state = document.getElementById('addr-state').value.trim();
+    const pincode = document.getElementById('addr-pincode').value.trim();
+    const errorEl = document.getElementById('address-error');
+
+    if(!name || !phone || !line1 || !city || !state || !pincode){
+      errorEl.textContent = 'Please fill in all required fields.';
+      return;
+    }
+    if(phone.replace(/\D/g,'').length !== 10){
+      errorEl.textContent = 'Enter a valid 10-digit mobile number.';
+      return;
+    }
+    if(pincode.replace(/\D/g,'').length !== 6){
+      errorEl.textContent = 'Enter a valid 6-digit pincode.';
+      return;
+    }
+
+    const newAddress = {
+      id: nextAddressId++,
+      label: addressFormLabel,
+      name, phone, line1, line2, city, state, pincode
+    };
+    addresses.push(newAddress);
+    selectedAddressId = newAddress.id;
+    showAddressForm = false;
+    addressFormLabel = 'Home';
+    renderCartDrawer();
+  }
+
+  // ---------- Payment method ----------
+  const paymentMethods = [
+    { key:'upi', icon:'📱', name:'UPI', sub:'Google Pay, PhonePe, Paytm & more' },
+    { key:'card', icon:'💳', name:'Credit / Debit Card', sub:'Visa, Mastercard, RuPay' },
+    { key:'netbanking', icon:'🏦', name:'Net Banking', sub:'All major Indian banks' },
+    { key:'cod', icon:'💵', name:'Cash on Delivery', sub:'Pay when your meal arrives' },
+  ];
+  let selectedPayment = null;
+
+  function renderPaymentOptions(){
+    const listEl = document.getElementById('payment-list');
+    listEl.innerHTML = paymentMethods.map(p => `
+      <div class="payment-option${selectedPayment === p.key ? ' selected' : ''}" data-key="${p.key}">
+        <span class="payment-option-icon">${p.icon}</span>
+        <div class="payment-option-text">
+          <p class="payment-option-name">${p.name}</p>
+          <p class="payment-option-sub">${p.sub}</p>
+        </div>
+        <span class="payment-option-radio"></span>
+      </div>`).join('');
+
+    listEl.querySelectorAll('.payment-option').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        selectedPayment = el.dataset.key;
+        document.getElementById('payment-error').textContent = '';
+        renderCartDrawer();
+      });
+    });
+  }
+
+  // ---------- Admin: login / logout ----------
+  document.getElementById('btn-admin-link').addEventListener('click', ()=>{
+    document.getElementById('admin-login-error').textContent = '';
+    document.getElementById('admin-username').value = '';
+    document.getElementById('admin-password').value = '';
+    show('adminLogin');
+  });
+  document.getElementById('btn-back-from-admin-login').addEventListener('click', ()=> show('auth'));
+
+  document.getElementById('btn-admin-login').addEventListener('click', async ()=>{
+    const u = document.getElementById('admin-username').value.trim();
+    const p = document.getElementById('admin-password').value.trim();
+    const errEl = document.getElementById('admin-login-error');
+    if(u === 'admin' && p === 'admin123'){
+      errEl.textContent = '';
+      show('admin');
+      renderAdminMealList();
+      await refreshAdminOrders();
+    } else {
+      errEl.textContent = 'Incorrect username or password.';
+    }
+  });
+
+  document.getElementById('btn-admin-logout').addEventListener('click', ()=>{
+    document.getElementById('admin-item-form-slot').innerHTML = '';
+    editingMealId = null;
+    show('auth');
+  });
+
+  // ---------- Admin: tabs ----------
+  let currentAdminTab = 'menu';
+  document.querySelectorAll('#admin-tabs .chip').forEach(chip=>{
+    chip.addEventListener('click', async ()=>{
+      currentAdminTab = chip.dataset.tab;
+      document.querySelectorAll('#admin-tabs .chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      document.getElementById('admin-menu-tab').style.display = currentAdminTab === 'menu' ? '' : 'none';
+      document.getElementById('admin-orders-tab').style.display = currentAdminTab === 'orders' ? '' : 'none';
+      if(currentAdminTab === 'orders') await refreshAdminOrders();
+    });
+  });
+
+  async function refreshAdminOrders(){
+    orders = await loadAllOrders();
+    unseenOrders = orders.filter(o => o.status === 'new').length;
+    updateAdminOrderBadge();
+    if(currentAdminTab === 'orders') renderAdminOrdersList();
+  }
+
+  function updateAdminOrderBadge(){
+    const badge = document.getElementById('admin-order-badge');
+    badge.textContent = unseenOrders;
+    badge.style.display = unseenOrders > 0 ? 'inline-flex' : 'none';
+  }
+
+  function renderAdminOrdersList(){
+    const el = document.getElementById('admin-orders-list');
+    if(orders.length === 0){
+      el.innerHTML = '<p class="admin-empty">No orders yet. New orders will appear here automatically.</p>';
+      return;
+    }
+    el.innerHTML = orders.map(o => `
+      <div class="admin-order-card">
+        <div class="order-head">
+          <span class="order-id">#${o.id}</span>
+          <span class="order-time">${new Date(o.placedAt).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}</span>
+        </div>
+        ${o.items.map(it => `<p class="order-line">${it.qty} × ${it.name}</p>`).join('')}
+        <p class="order-meta">
+          ${o.customerContact || 'Guest'} · ${o.address.name}, ${o.address.line1}, ${o.address.city} ${o.address.pincode}<br>
+          Payment: ${o.paymentLabel}
+        </p>
+        <div class="order-head" style="margin-top:8px;">
+          <span class="order-total">₹${o.total}</span>
+          ${o.status === 'new'
+            ? `<button type="button" class="add-address-btn" style="width:auto; padding:7px 16px; margin:0;" data-id="${o.id}">Mark fulfilled</button>`
+            : `<span style="font-size:11px; color:var(--muted);">Fulfilled ✓</span>`}
+        </div>
+      </div>`).join('');
+
+    el.querySelectorAll('button[data-id]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const order = orders.find(o => o.id === btn.dataset.id);
+        order.status = 'fulfilled';
+        await saveOrder(order);
+        unseenOrders = orders.filter(o => o.status === 'new').length;
+        updateAdminOrderBadge();
+        renderAdminOrdersList();
+      });
+    });
+  }
+
+  // ---------- Admin: menu item CRUD ----------
+  let editingMealId = null;
+
+  function renderAdminMealList(){
+    const el = document.getElementById('admin-meal-list');
+    el.innerHTML = meals.map(m => `
+      <div class="admin-meal-card">
+        <div class="thumb" style="background:${m.bg};">${m.emoji}</div>
+        <div class="info">
+          <h4>${m.name}</h4>
+          <div class="meta">${m.tag} · ₹${m.price} · ${m.kcal} kcal</div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn-edit" data-action="edit" data-id="${m.id}">Edit</button>
+          <button type="button" class="btn-del" data-action="delete" data-id="${m.id}">Delete</button>
+        </div>
+      </div>`).join('');
+
+    el.querySelectorAll('button[data-action="edit"]').forEach(btn=>{
+      btn.addEventListener('click', ()=> openItemForm(Number(btn.dataset.id)));
+    });
+    el.querySelectorAll('button[data-action="delete"]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        meals = meals.filter(m => m.id !== Number(btn.dataset.id));
+        await saveMeals();
+        lastMealsSnapshot = JSON.stringify(meals);
+        renderAdminMealList();
+        if(screens.menu.classList.contains('active')){ renderMeals(); animateRings(); }
+      });
+    });
+  }
+
+  function openItemForm(id){
+    editingMealId = id;
+    const m = id ? meals.find(x => x.id === id) : null;
+    const slot = document.getElementById('admin-item-form-slot');
+    slot.innerHTML = `
+      <div class="address-form" style="margin-bottom:14px;">
+        <div class="field"><input type="text" id="item-name" placeholder="Meal name" value="${m ? m.name : ''}"></div>
+        <div class="field-row">
+          <div class="field"><input type="text" id="item-tag" placeholder="Tag (e.g. Post-Workout)" value="${m ? m.tag : ''}"></div>
+          <div class="field"><input type="text" id="item-emoji" placeholder="Emoji" maxlength="4" value="${m ? m.emoji : '🍽️'}"></div>
+        </div>
+        <div class="field"><input type="text" id="item-desc" placeholder="Short description" value="${m ? m.desc : ''}"></div>
+        <div class="field-row">
+          <div class="field"><input type="number" id="item-protein" placeholder="Protein (g)" value="${m ? m.protein : ''}"></div>
+          <div class="field"><input type="number" id="item-carb" placeholder="Carbs (g)" value="${m ? m.carb : ''}"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><input type="number" id="item-fat" placeholder="Fat (g)" value="${m ? m.fat : ''}"></div>
+          <div class="field"><input type="number" id="item-kcal" placeholder="Kcal" value="${m ? m.kcal : ''}"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><input type="number" id="item-price" placeholder="Price (₹)" value="${m ? m.price : ''}"></div>
+          <div class="field">
+            <select id="item-cat" style="width:100%; background:transparent; border:none; color:var(--paper); padding:15px 0; font-family:'Work Sans',sans-serif; font-size:14px;">
+              ${Object.entries(catMeta).map(([key,c]) => `<option value="${key}" ${m && m.cat===key ? 'selected' : ''}>${c.label}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <p class="address-error" id="item-form-error"></p>
+        <div class="address-form-actions">
+          <button type="button" class="btn-secondary" id="item-cancel">Cancel</button>
+          <button type="button" class="btn-primary" id="item-save">${m ? 'Save changes' : 'Add item'}</button>
+        </div>
+      </div>`;
+
+    document.getElementById('item-cancel').addEventListener('click', ()=>{
+      slot.innerHTML = '';
+      editingMealId = null;
+    });
+    document.getElementById('item-save').addEventListener('click', saveItemForm);
+  }
+
+  async function saveItemForm(){
+    const name = document.getElementById('item-name').value.trim();
+    const tag = document.getElementById('item-tag').value.trim();
+    const emoji = document.getElementById('item-emoji').value.trim() || '🍽️';
+    const desc = document.getElementById('item-desc').value.trim();
+    const protein = Number(document.getElementById('item-protein').value) || 0;
+    const carb = Number(document.getElementById('item-carb').value) || 0;
+    const fat = Number(document.getElementById('item-fat').value) || 0;
+    const kcal = Number(document.getElementById('item-kcal').value) || 0;
+    const price = Number(document.getElementById('item-price').value) || 0;
+    const cat = document.getElementById('item-cat').value;
+    const errEl = document.getElementById('item-form-error');
+
+    if(!name || !tag || !desc || !price || !kcal){
+      errEl.textContent = 'Please fill in name, tag, description, kcal and price.';
+      return;
+    }
+
+    const bg = catMeta[cat] ? catMeta[cat].bg : '#2A2A2A';
+
+    if(editingMealId){
+      const m = meals.find(x => x.id === editingMealId);
+      Object.assign(m, { name, tag, emoji, desc, protein, carb, fat, kcal, price, cat, bg });
+    } else {
+      meals.push({ id: nextMealId++, name, tag, emoji, desc, protein, carb, fat, kcal, price, cat, bg });
+    }
+    await saveMeals();
+    lastMealsSnapshot = JSON.stringify(meals);
+    document.getElementById('admin-item-form-slot').innerHTML = '';
+    editingMealId = null;
+    renderAdminMealList();
+    if(screens.menu.classList.contains('active')){ renderMeals(); animateRings(); }
+  }
+
+  document.getElementById('btn-open-add-item').addEventListener('click', ()=> openItemForm(null));
+
+  // ---------- Sync: pick up admin menu edits on the customer side ----------
+  setInterval(async ()=>{
+    if(!hasStorage) return;
+    if(!screens.menu.classList.contains('active') && !screens.admin.classList.contains('active')) return;
+    const loaded = await loadMeals();
+    const snap = JSON.stringify(loaded);
+    if(snap !== lastMealsSnapshot){
+      lastMealsSnapshot = snap;
+      meals = loaded;
+      nextMealId = meals.reduce((max,m) => Math.max(max, m.id), 0) + 1;
+      if(screens.menu.classList.contains('active')){ renderMeals(); animateRings(); }
+      if(screens.admin.classList.contains('active')) renderAdminMealList();
+    }
+  }, 6000);
+
+  // Keep the admin order badge/list fresh while the dashboard is open
+  setInterval(()=>{
+    if(!hasStorage) return;
+    if(!screens.admin.classList.contains('active')) return;
+    refreshAdminOrders();
+  }, 5000);
+
+  // ---------- Initial load from shared storage ----------
+  (async function initMenu(){
+    const loaded = await loadMeals();
+    meals = loaded;
+    nextMealId = meals.reduce((max,m) => Math.max(max, m.id), 0) + 1;
+    lastMealsSnapshot = JSON.stringify(meals);
+    if(screens.menu.classList.contains('active')){ renderMeals(); animateRings(); }
+  })();
+
+  document.getElementById('cart-checkout').addEventListener('click', ()=>{
+    if(cart.length === 0) return;
+    if(!selectedAddressId){
+      return;
+    }
+    if(!selectedPayment){
+      document.getElementById('payment-error').textContent = 'Choose a payment method to continue.';
+      return;
+    }
+    const methodName = paymentMethods.find(p => p.key === selectedPayment).name;
+    const btn = document.getElementById('cart-checkout');
+    btn.textContent = selectedPayment === 'cod'
+      ? 'Order placed ✓ — pay on delivery'
+      : `Order placed via ${methodName} ✓`;
+    btn.disabled = true;
+
+    const grouped = groupedCart();
+    const orderAddress = addresses.find(a => a.id === selectedAddressId);
+    const order = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      placedAt: Date.now(),
+      items: grouped.map(m => ({ name: m.name, qty: m.qty, price: m.price })),
+      total: grouped.reduce((sum,m) => sum + m.price*m.qty, 0),
+      address: orderAddress,
+      customerContact: customerPhone ? ('+91 ' + customerPhone) : (customerEmail || 'Guest'),
+      paymentLabel: methodName,
+      status: 'new',
+    };
+
+    setTimeout(async ()=>{
+      completedOrders += 1;
+      cart = [];
+      selectedPayment = null;
+      await saveOrder(order);
+      updateScoreboard(); // re-renders the drawer, which sets the correct empty-cart label/disabled state
+      closeCart();
+    }, 1400);
+  });
+
+  // Today's date label
+  document.getElementById('menu-date').textContent =
+    new Date().toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+
+})();
+</script>
+</body>
+</html>
