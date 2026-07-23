@@ -625,7 +625,7 @@
       </div>
 
       <div class="field">
-        <input type="text" id="admin-username" placeholder="Admin username">
+        <input type="email" id="admin-username" placeholder="Admin email">
       </div>
       <div class="field">
         <input type="password" id="admin-password" placeholder="Password">
@@ -633,8 +633,8 @@
       <p class="address-error" id="admin-login-error"></p>
       <button class="btn-primary" id="btn-admin-login">Sign in</button>
       <div class="dev-otp-banner" style="display:block; margin-top:18px;">
-        <strong>DEMO CREDENTIALS</strong><br>
-        Username: <span class="code" style="font-size:14px;">admin</span> &nbsp; Password: <span class="code" style="font-size:14px;">admin123</span>
+        Sign in with the admin email &amp; password you created in Firebase Authentication.
+        <br><span style="color:var(--muted);">(Falls back to demo login <span class="code">admin</span> / <span class="code">admin123</span> if Firebase can't be reached.)</span>
       </div>
     </div>
   </section>
@@ -783,6 +783,58 @@
     </div>
   </section>
 </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, collection, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import {
+    getAuth, signInWithEmailAndPassword, signOut
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBR0uOL998628_xevxARhtcrU9VWgJqMwI",
+    authDomain: "perfonutri.firebaseapp.com",
+    projectId: "perfonutri",
+    storageBucket: "perfonutri.firebasestorage.app",
+    messagingSenderId: "222678979867",
+    appId: "1:222678979867:web:1e533e52f02ad79f0cafbe",
+    measurementId: "G-WCKCDQREDR"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const MENU_DOC = doc(db, 'config', 'menu');
+    const ORDERS_COL = collection(db, 'orders');
+
+    window.firebaseAPI = {
+      async loadMeals(){
+        const snap = await getDoc(MENU_DOC);
+        return snap.exists() ? snap.data().items : null;
+      },
+      async saveMeals(meals){ await setDoc(MENU_DOC, { items: meals }); },
+      subscribeMenu(cb){
+        return onSnapshot(MENU_DOC, snap => { if(snap.exists()) cb(snap.data().items); },
+          err => console.error('Menu subscription error:', err));
+      },
+      async saveOrder(order){ await setDoc(doc(ORDERS_COL, order.id), order); },
+      subscribeOrders(cb){
+        return onSnapshot(ORDERS_COL, snap => {
+          cb(snap.docs.map(d => d.data()).sort((a,b) => b.placedAt - a.placedAt));
+        }, err => console.error('Orders subscription error:', err));
+      },
+      async adminSignIn(email, password){ await signInWithEmailAndPassword(auth, email, password); },
+      async adminSignOut(){ await signOut(auth); },
+    };
+
+    window.dispatchEvent(new Event('firebase-ready'));
+  } catch(e){
+    console.error('Firebase failed to initialize — app will fall back to local/demo mode.', e);
+  }
+</script>
 
 <script>
 (function(){
@@ -997,6 +1049,12 @@
   ];
 
   async function loadMeals(){
+    if(window.firebaseAPI){
+      try{
+        const fromFirebase = await window.firebaseAPI.loadMeals();
+        if(fromFirebase) return fromFirebase;
+      } catch(e){ console.error('Firebase loadMeals failed:', e); }
+    }
     if(!hasStorage) return DEFAULT_MEALS.map(m => ({ ...m }));
     try{
       const res = await window.storage.get(STORAGE_KEY_MEALS, true);
@@ -1005,6 +1063,9 @@
     return DEFAULT_MEALS.map(m => ({ ...m }));
   }
   async function saveMeals(){
+    if(window.firebaseAPI){
+      try{ await window.firebaseAPI.saveMeals(meals); return; } catch(e){ console.error('Firebase saveMeals failed:', e); }
+    }
     if(!hasStorage) return;
     try{ await window.storage.set(STORAGE_KEY_MEALS, JSON.stringify(meals), true); } catch(e){ /* storage unavailable */ }
   }
@@ -1023,6 +1084,9 @@
     } catch(e){ return []; }
   }
   async function saveOrder(order){
+    if(window.firebaseAPI){
+      try{ await window.firebaseAPI.saveOrder(order); return; } catch(e){ console.error('Firebase saveOrder failed:', e); }
+    }
     if(!hasStorage) return;
     try{ await window.storage.set(ORDER_KEY_PREFIX + order.id, JSON.stringify(order), true); } catch(e){ /* storage unavailable */ }
   }
@@ -1470,6 +1534,8 @@
   }
 
   // ---------- Admin: login / logout ----------
+  let unsubscribeOrders = null;
+
   document.getElementById('btn-admin-link').addEventListener('click', ()=>{
     document.getElementById('admin-login-error').textContent = '';
     document.getElementById('admin-username').value = '';
@@ -1482,19 +1548,45 @@
     const u = document.getElementById('admin-username').value.trim();
     const p = document.getElementById('admin-password').value.trim();
     const errEl = document.getElementById('admin-login-error');
-    if(u === 'admin' && p === 'admin123'){
+
+    async function enterAdmin(){
       errEl.textContent = '';
       show('admin');
       renderAdminMealList();
-      await refreshAdminOrders();
+      if(window.firebaseAPI){
+        if(unsubscribeOrders) unsubscribeOrders();
+        unsubscribeOrders = window.firebaseAPI.subscribeOrders((liveOrders)=>{
+          orders = liveOrders;
+          unseenOrders = orders.filter(o => o.status === 'new').length;
+          updateAdminOrderBadge();
+          if(currentAdminTab === 'orders') renderAdminOrdersList();
+        });
+      } else {
+        await refreshAdminOrders();
+      }
+    }
+
+    if(window.firebaseAPI){
+      try{
+        await window.firebaseAPI.adminSignIn(u, p);
+        await enterAdmin();
+      } catch(e){
+        errEl.textContent = 'Incorrect email or password.';
+      }
+    } else if(u === 'admin' && p === 'admin123'){
+      await enterAdmin();
     } else {
       errEl.textContent = 'Incorrect username or password.';
     }
   });
 
-  document.getElementById('btn-admin-logout').addEventListener('click', ()=>{
+  document.getElementById('btn-admin-logout').addEventListener('click', async ()=>{
     document.getElementById('admin-item-form-slot').innerHTML = '';
     editingMealId = null;
+    if(unsubscribeOrders){ unsubscribeOrders(); unsubscribeOrders = null; }
+    if(window.firebaseAPI){
+      try{ await window.firebaseAPI.adminSignOut(); } catch(e){ /* ignore */ }
+    }
     show('auth');
   });
 
@@ -1507,7 +1599,10 @@
       chip.classList.add('active');
       document.getElementById('admin-menu-tab').style.display = currentAdminTab === 'menu' ? '' : 'none';
       document.getElementById('admin-orders-tab').style.display = currentAdminTab === 'orders' ? '' : 'none';
-      if(currentAdminTab === 'orders') await refreshAdminOrders();
+      if(currentAdminTab === 'orders'){
+        if(window.firebaseAPI) renderAdminOrdersList(); // already kept fresh by the live subscription
+        else await refreshAdminOrders();
+      }
     });
   });
 
@@ -1672,7 +1767,9 @@
   document.getElementById('btn-open-add-item').addEventListener('click', ()=> openItemForm(null));
 
   // ---------- Sync: pick up admin menu edits on the customer side ----------
+  // (Only runs when Firebase isn't active — Firebase uses the live subscription below instead.)
   setInterval(async ()=>{
+    if(window.firebaseAPI) return;
     if(!hasStorage) return;
     if(!screens.menu.classList.contains('active') && !screens.admin.classList.contains('active')) return;
     const loaded = await loadMeals();
@@ -1687,20 +1784,41 @@
   }, 6000);
 
   // Keep the admin order badge/list fresh while the dashboard is open
+  // (Only runs when Firebase isn't active — Firebase pushes updates live instead.)
   setInterval(()=>{
+    if(window.firebaseAPI) return;
     if(!hasStorage) return;
     if(!screens.admin.classList.contains('active')) return;
     refreshAdminOrders();
   }, 5000);
 
-  // ---------- Initial load from shared storage ----------
-  (async function initMenu(){
+  // ---------- Initial load ----------
+  // Show synced content immediately using whatever backend is ready right now
+  // (Firebase if it's already loaded, else the artifact's shared storage, else
+  // just the local defaults). If Firebase finishes loading a moment later —
+  // module scripts are deferred, so it may arrive after this runs — seamlessly
+  // upgrade to a live subscription for real-time updates from then on.
+  (async function initMenuFast(){
     const loaded = await loadMeals();
     meals = loaded;
     nextMealId = meals.reduce((max,m) => Math.max(max, m.id), 0) + 1;
     lastMealsSnapshot = JSON.stringify(meals);
     if(screens.menu.classList.contains('active')){ renderMeals(); animateRings(); }
   })();
+
+  function onFirebaseReady(cb){
+    if(window.firebaseAPI) return cb();
+    window.addEventListener('firebase-ready', cb, { once:true });
+  }
+  onFirebaseReady(function upgradeToLiveMenu(){
+    window.firebaseAPI.subscribeMenu((liveMeals)=>{
+      meals = liveMeals;
+      nextMealId = meals.reduce((max,m) => Math.max(max, m.id), 0) + 1;
+      lastMealsSnapshot = JSON.stringify(meals);
+      if(screens.menu.classList.contains('active')){ renderMeals(); animateRings(); }
+      if(screens.admin.classList.contains('active')) renderAdminMealList();
+    });
+  });
 
   document.getElementById('cart-checkout').addEventListener('click', ()=>{
     if(cart.length === 0) return;
