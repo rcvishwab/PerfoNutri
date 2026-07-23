@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>SPLIT — Fuel your training</title>
+<title>Performance Nutrition Kitchen — Eat Smart. Play Hard.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -165,6 +165,22 @@
   .btn-primary:active{ transform:scale(0.98); }
   .btn-primary:disabled{ background:var(--signal-dim); cursor:not-allowed; }
 
+  .auth-divider{
+    display:flex; align-items:center; gap:12px; margin:18px 0;
+    color:var(--muted); font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+  }
+  .auth-divider::before, .auth-divider::after{
+    content:""; flex:1; height:1px; background:var(--line);
+  }
+  .btn-google{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--paper); color:#3C4043; border:1px solid var(--line);
+    border-radius:var(--radius-md); padding:14px 0; font-family:'Work Sans',sans-serif;
+    font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .btn-google:hover{ box-shadow:0 0 0 1px var(--signal); }
+  .btn-google:active{ transform:scale(0.98); }
+
   .guest-link{
     text-align:center;
     margin-top:22px;
@@ -184,25 +200,6 @@
   }
   .back-row svg{ width:16px; height:16px; }
 
-  .otp-row{ display:flex; gap:10px; margin-bottom:22px; }
-  .otp-row.shake{ animation:shake .4s ease; }
-  @keyframes shake{
-    10%,90%{ transform:translateX(-2px); }
-    20%,80%{ transform:translateX(4px); }
-    30%,50%,70%{ transform:translateX(-8px); }
-    40%,60%{ transform:translateX(8px); }
-  }
-  .otp-row input{
-    width:100%; aspect-ratio:1; text-align:center;
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm);
-    color:var(--paper); font-family:'JetBrains Mono',monospace; font-size:22px;
-    outline:none; transition:border-color .2s ease;
-  }
-  .otp-row input:focus{ border-color:var(--signal); }
-  .otp-row.error input{ border-color:var(--signal); }
-  .otp-error{
-    font-size:12.5px; color:var(--signal); margin:-12px 0 18px; min-height:16px;
-  }
   .dev-otp-banner{
     display:none;
     background:rgba(11,110,99,0.14);
@@ -217,9 +214,6 @@
   }
   .dev-otp-banner strong{ color:var(--teal); letter-spacing:0.08em; }
   .dev-otp-banner .code{ font-size:20px; font-weight:700; color:var(--paper); letter-spacing:0.15em; }
-  .resend{ font-size:13px; color:var(--muted); text-align:center; }
-  .resend button{ background:none;border:none;color:var(--signal);font-weight:600;cursor:pointer;font-size:13px;font-family:inherit; }
-  .resend button:disabled{ color:var(--muted); cursor:not-allowed; text-decoration:none; }
 
   /* ---------- Menu screen ---------- */
   .menu-header{
@@ -265,7 +259,7 @@
     overflow:hidden;
   }
   .scoreboard::before{
-    content:"TODAY'S SPLIT";
+    content:"TODAY'S MACROS";
     position:absolute; top:8px; left:18px;
     font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.18em; color:#4A5056;
   }
@@ -580,33 +574,41 @@
     <span class="dot-row"><span></span><span></span><span></span></span>
   </div>
 
-  <!-- ================= AUTH — METHOD CHOICE ================= -->
+  <!-- ================= AUTH ================= -->
   <section class="screen active" id="screen-auth">
     <div class="auth-wrap">
       <div class="brand">
-        <p class="brand-mark">SPLIT · PERFORMANCE KITCHEN</p>
-        <h1 class="headline">Fuel every<br><em>split.</em></h1>
-        <p class="sub">Macro-built meals, timed to your training. Sign in to set your plate.</p>
+        <p class="brand-mark">PERFORMANCE NUTRITION KITCHEN</p>
+        <h1 class="headline">Eat smart.<br><em>Play hard.</em></h1>
+        <p class="sub" id="auth-sub">Macro-built meals, timed to your training. Sign in to set your plate.</p>
       </div>
 
       <div class="method-toggle">
-        <button type="button" class="active" id="tab-phone">Phone</button>
-        <button type="button" id="tab-email">Email</button>
+        <button type="button" class="active" id="tab-signin">Sign in</button>
+        <button type="button" id="tab-signup">Sign up</button>
       </div>
 
-      <div id="field-phone" class="field">
-        <span class="prefix">+91</span>
-        <input type="tel" inputmode="numeric" maxlength="10" placeholder="98765 43210" id="input-phone">
+      <div class="field">
+        <input type="email" placeholder="you@trainingcamp.in" id="input-email" autocomplete="email">
+      </div>
+      <div class="field">
+        <input type="password" placeholder="Password" id="input-password" autocomplete="current-password">
+      </div>
+      <div class="field" id="field-confirm-password" style="display:none;">
+        <input type="password" placeholder="Confirm password" id="input-confirm-password" autocomplete="new-password">
       </div>
 
-      <div id="field-email" class="field" style="display:none;">
-        <input type="email" placeholder="you@trainingcamp.in" id="input-email">
-      </div>
+      <p class="address-error" id="auth-error"></p>
+      <button class="btn-primary" id="btn-continue">Sign in</button>
 
-      <button class="btn-primary" id="btn-continue">Continue</button>
+      <div class="auth-divider"><span>or</span></div>
+
+      <button type="button" class="btn-google" id="btn-google">
+        <svg viewBox="0 0 18 18" width="18" height="18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.9v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.9A9 9 0 0 0 0 9c0 1.45.35 2.83.9 4.03l3.05-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .9 4.97l3.05 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
 
       <p class="guest-link">or <button type="button" id="btn-guest">browse the menu as a guest</button></p>
-      <p class="fine-print">We'll send a 4-digit OTP by SMS or email to confirm it's you. Standard SMS rates may apply.</p>
       <p class="fine-print" style="text-align:center; margin-top:10px;">Restaurant staff? <button type="button" id="btn-admin-link" style="background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:11px;font-family:inherit;">Admin sign in</button></p>
     </div>
   </section>
@@ -619,7 +621,7 @@
         Back
       </div>
       <div class="brand">
-        <p class="brand-mark">SPLIT · ADMIN</p>
+        <p class="brand-mark">PERFORMANCE NUTRITION KITCHEN · ADMIN</p>
         <h1 class="headline" style="font-size:44px;">Kitchen<br><em>console.</em></h1>
         <p class="sub">Manage the live menu and see incoming orders.</p>
       </div>
@@ -666,32 +668,6 @@
 
     <div id="admin-orders-tab" class="meal-list" style="padding-bottom:40px; display:none;">
       <div id="admin-orders-list"></div>
-    </div>
-  </section>
-
-  <!-- ================= AUTH — VERIFY CODE ================= -->
-  <section class="screen" id="screen-verify">
-    <div class="auth-wrap">
-      <div class="back-row" id="btn-back-auth">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-        Back
-      </div>
-      <p class="brand-mark">VERIFY IT'S YOU</p>
-      <h1 class="headline" style="font-size:42px;">Enter your<br><em>OTP.</em></h1>
-      <p class="sub" id="verify-sub">We sent a 4-digit OTP to your mobile number.</p>
-
-      <div class="dev-otp-banner" id="dev-otp-banner"></div>
-
-      <div class="otp-row" id="otp-row">
-        <input maxlength="1" inputmode="numeric" class="otp-digit">
-        <input maxlength="1" inputmode="numeric" class="otp-digit">
-        <input maxlength="1" inputmode="numeric" class="otp-digit">
-        <input maxlength="1" inputmode="numeric" class="otp-digit">
-      </div>
-      <p class="otp-error" id="otp-error"></p>
-
-      <button class="btn-primary" id="btn-verify">Verify &amp; sign in</button>
-      <p class="resend">Didn't get it? <button type="button" id="btn-resend">Resend code</button></p>
     </div>
   </section>
 
@@ -790,7 +766,8 @@
     getFirestore, doc, getDoc, setDoc, collection, onSnapshot
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
   import {
-    getAuth, signInWithEmailAndPassword, signOut
+    getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+    GoogleAuthProvider, signInWithPopup, signOut
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -828,6 +805,20 @@
       },
       async adminSignIn(email, password){ await signInWithEmailAndPassword(auth, email, password); },
       async adminSignOut(){ await signOut(auth); },
+      async signUp(email, password){
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        return cred.user;
+      },
+      async signIn(email, password){
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        return cred.user;
+      },
+      async signInWithGoogle(){
+        const provider = new GoogleAuthProvider();
+        const cred = await signInWithPopup(auth, provider);
+        return cred.user;
+      },
+      async customerSignOut(){ await signOut(auth); },
     };
 
     window.dispatchEvent(new Event('firebase-ready'));
@@ -841,7 +832,6 @@
   // ---------- Screen navigation ----------
   const screens = {
     auth: document.getElementById('screen-auth'),
-    verify: document.getElementById('screen-verify'),
     menu: document.getElementById('screen-menu'),
     adminLogin: document.getElementById('screen-admin-login'),
     admin: document.getElementById('screen-admin'),
@@ -851,153 +841,98 @@
     screens[name].classList.add('active');
   }
 
-  // ---------- Auth method toggle ----------
-  const tabPhone = document.getElementById('tab-phone');
-  const tabEmail = document.getElementById('tab-email');
-  const fieldPhone = document.getElementById('field-phone');
-  const fieldEmail = document.getElementById('field-email');
-  let method = 'phone';
-
-  tabPhone.addEventListener('click', ()=>{
-    method = 'phone';
-    tabPhone.classList.add('active'); tabEmail.classList.remove('active');
-    fieldPhone.style.display='flex'; fieldEmail.style.display='none';
-  });
-  tabEmail.addEventListener('click', ()=>{
-    method = 'email';
-    tabEmail.classList.add('active'); tabPhone.classList.remove('active');
-    fieldEmail.style.display='flex'; fieldPhone.style.display='none';
-  });
-
-  // ---------- Continue -> verify ----------
-  let currentCode = null;
-  let codeExpiresAt = null;
-  let resendTimer = null;
-  let customerPhone = '';
+  // ---------- Auth: sign in / sign up toggle ----------
+  const tabSignin = document.getElementById('tab-signin');
+  const tabSignup = document.getElementById('tab-signup');
+  const fieldConfirmPassword = document.getElementById('field-confirm-password');
+  const btnContinue = document.getElementById('btn-continue');
+  let authMode = 'signin';
   let customerEmail = '';
-  const EXPIRY_SECONDS = 60;
-  const RESEND_COOLDOWN = 30;
 
-  function generateCode(){
-    currentCode = String(Math.floor(1000 + Math.random()*9000)); // 4-digit
-    codeExpiresAt = Date.now() + EXPIRY_SECONDS*1000;
-    return currentCode;
+  tabSignin.addEventListener('click', ()=>{
+    authMode = 'signin';
+    tabSignin.classList.add('active'); tabSignup.classList.remove('active');
+    fieldConfirmPassword.style.display = 'none';
+    btnContinue.textContent = 'Sign in';
+    document.getElementById('auth-error').textContent = '';
+  });
+  tabSignup.addEventListener('click', ()=>{
+    authMode = 'signup';
+    tabSignup.classList.add('active'); tabSignin.classList.remove('active');
+    fieldConfirmPassword.style.display = 'flex';
+    btnContinue.textContent = 'Create account';
+    document.getElementById('auth-error').textContent = '';
+  });
+
+  function friendlyAuthError(e){
+    const code = e && e.code ? e.code : '';
+    if(code.includes('email-already-in-use')) return 'An account already exists with that email — try signing in instead.';
+    if(code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) return 'Incorrect email or password.';
+    if(code.includes('weak-password')) return 'Password should be at least 6 characters.';
+    if(code.includes('invalid-email')) return 'Enter a valid email address.';
+    if(code.includes('popup-closed-by-user')) return 'Google sign-in was closed before finishing.';
+    return 'Something went wrong. Please try again.';
   }
 
-  function showDevBanner(destination){
-    const banner = document.getElementById('dev-otp-banner');
-    banner.style.display = 'block';
-    banner.innerHTML = `<strong>DEV MODE — no real SMS/email is sent.</strong><br>
-      Your OTP for ${destination}: <span class="code">${currentCode}</span>
-      <br>Expires in ${EXPIRY_SECONDS}s.`;
-  }
+  document.getElementById('btn-continue').addEventListener('click', async ()=>{
+    const email = document.getElementById('input-email').value.trim();
+    const password = document.getElementById('input-password').value;
+    const confirm = document.getElementById('input-confirm-password').value;
+    const errEl = document.getElementById('auth-error');
+    errEl.textContent = '';
 
-  function startResendCooldown(){
-    const btn = document.getElementById('btn-resend');
-    let secondsLeft = RESEND_COOLDOWN;
+    if(!email || !password){
+      errEl.textContent = 'Enter your email and password.';
+      return;
+    }
+    if(password.length < 6){
+      errEl.textContent = 'Password should be at least 6 characters.';
+      return;
+    }
+    if(authMode === 'signup' && password !== confirm){
+      errEl.textContent = 'Passwords do not match.';
+      return;
+    }
+
+    const btn = document.getElementById('btn-continue');
     btn.disabled = true;
-    btn.textContent = `Resend in ${secondsLeft}s`;
-    clearInterval(resendTimer);
-    resendTimer = setInterval(()=>{
-      secondsLeft -= 1;
-      if(secondsLeft <= 0){
-        clearInterval(resendTimer);
-        btn.disabled = false;
-        btn.textContent = 'Resend code';
-      } else {
-        btn.textContent = `Resend in ${secondsLeft}s`;
+
+    if(window.firebaseAPI){
+      try{
+        if(authMode === 'signup') await window.firebaseAPI.signUp(email, password);
+        else await window.firebaseAPI.signIn(email, password);
+        customerEmail = email;
+        enterMenu();
+      } catch(e){
+        errEl.textContent = friendlyAuthError(e);
       }
-    }, 1000);
-  }
-
-  document.getElementById('btn-continue').addEventListener('click', ()=>{
-    const val = method === 'phone'
-      ? document.getElementById('input-phone').value.trim()
-      : document.getElementById('input-email').value.trim();
-    if(!val){
-      const target = method === 'phone' ? document.getElementById('input-phone') : document.getElementById('input-email');
-      target.style.borderColor = '#FF4E1F';
-      target.focus();
-      return;
+    } else {
+      // Demo fallback if Firebase isn't reachable — accepts any valid-looking email/password
+      customerEmail = email;
+      enterMenu();
     }
-    if(method === 'phone' && val.replace(/\D/g,'').length !== 10){
-      const target = document.getElementById('input-phone');
-      target.style.borderColor = '#FF4E1F';
-      target.focus();
-      return;
-    }
-    const destination = method === 'phone' ? '+91 ' + val : val;
-    if(method === 'phone') customerPhone = val.replace(/\D/g,''); else customerEmail = val;
-    document.getElementById('verify-sub').textContent = 'We sent a 4-digit OTP to ' + destination;
-    generateCode();
-    show('verify');
-    otpInputs.forEach(i => i.value = '');
-    document.getElementById('otp-error').textContent = '';
-    document.getElementById('otp-row').classList.remove('error');
-    showDevBanner(destination);
-    startResendCooldown();
-    otpInputs[0].focus();
+    btn.disabled = false;
   });
 
-  document.getElementById('btn-back-auth').addEventListener('click', ()=>{
-    clearInterval(resendTimer);
-    document.getElementById('dev-otp-banner').style.display = 'none';
-    show('auth');
+  document.getElementById('btn-google').addEventListener('click', async ()=>{
+    const errEl = document.getElementById('auth-error');
+    errEl.textContent = '';
+    if(window.firebaseAPI){
+      try{
+        const user = await window.firebaseAPI.signInWithGoogle();
+        customerEmail = user.email || '';
+        enterMenu();
+      } catch(e){
+        errEl.textContent = friendlyAuthError(e);
+      }
+    } else {
+      // Demo fallback if Firebase isn't reachable
+      customerEmail = 'demo.googleuser@gmail.com';
+      enterMenu();
+    }
   });
+
   document.getElementById('btn-guest').addEventListener('click', ()=> enterMenu());
-  document.getElementById('btn-resend').addEventListener('click', (e)=>{
-    if(e.target.disabled) return;
-    generateCode();
-    const destination = document.getElementById('verify-sub').textContent.replace('We sent a 4-digit OTP to ', '');
-    showDevBanner(destination);
-    startResendCooldown();
-    otpInputs.forEach(i => i.value = '');
-    otpInputs[0].focus();
-    document.getElementById('otp-error').textContent = '';
-    document.getElementById('otp-row').classList.remove('error');
-  });
-
-  // OTP auto-advance
-  const otpInputs = Array.from(document.querySelectorAll('.otp-digit'));
-  otpInputs.forEach((inp, i)=>{
-    inp.addEventListener('input', ()=>{
-      inp.value = inp.value.replace(/[^0-9]/g,'');
-      if(inp.value && otpInputs[i+1]) otpInputs[i+1].focus();
-    });
-    inp.addEventListener('keydown', (e)=>{
-      if(e.key === 'Backspace' && !inp.value && otpInputs[i-1]) otpInputs[i-1].focus();
-      if(e.key === 'Enter') document.getElementById('btn-verify').click();
-    });
-  });
-
-  document.getElementById('btn-verify').addEventListener('click', ()=>{
-    const entered = otpInputs.map(i => i.value).join('');
-    const otpRow = document.getElementById('otp-row');
-    const errorEl = document.getElementById('otp-error');
-
-    if(entered.length < 4){
-      errorEl.textContent = 'Enter all 4 digits.';
-      otpRow.classList.add('shake');
-      setTimeout(()=> otpRow.classList.remove('shake'), 400);
-      return;
-    }
-    if(Date.now() > codeExpiresAt){
-      errorEl.textContent = 'This code expired. Tap resend to get a new one.';
-      otpRow.classList.add('shake');
-      setTimeout(()=> otpRow.classList.remove('shake'), 400);
-      return;
-    }
-    if(entered !== currentCode){
-      errorEl.textContent = 'Incorrect code. Check the digits and try again.';
-      otpRow.classList.add('error', 'shake');
-      setTimeout(()=> otpRow.classList.remove('shake'), 400);
-      otpInputs.forEach(i => i.value = '');
-      otpInputs[0].focus();
-      return;
-    }
-    clearInterval(resendTimer);
-    enterMenu();
-  });
 
   function enterMenu(){
     show('menu');
@@ -1243,7 +1178,7 @@
 
   function renderProfile(){
     const body = document.getElementById('profile-body');
-    const isGuest = !customerPhone && !customerEmail;
+    const isGuest = !customerEmail;
 
     if(isGuest){
       body.innerHTML = `
@@ -1258,7 +1193,7 @@
       return;
     }
 
-    const contact = customerPhone ? ('+91 ' + customerPhone) : customerEmail;
+    const contact = customerEmail;
     const initial = (addresses[0]?.name?.[0] || contact[0] || 'A').toUpperCase();
     const displayName = addresses.find(a => a.id === selectedAddressId)?.name || addresses[0]?.name || 'Athlete';
 
@@ -1294,16 +1229,19 @@
     document.getElementById('profile-signout').addEventListener('click', signOut);
   }
 
-  function signOut(){
-    customerPhone = '';
+  async function signOut(){
     customerEmail = '';
     cart = [];
     selectedPayment = null;
     selectedAddressId = null;
     addresses = [];
     completedOrders = 0;
-    document.getElementById('input-phone').value = '';
     document.getElementById('input-email').value = '';
+    document.getElementById('input-password').value = '';
+    document.getElementById('input-confirm-password').value = '';
+    if(window.firebaseAPI){
+      try{ await window.firebaseAPI.customerSignOut(); } catch(e){ /* ignore */ }
+    }
     closeProfile();
     show('auth');
   }
@@ -1396,7 +1334,7 @@
           </div>
           <div class="field"><input type="text" id="addr-name" placeholder="Full name"></div>
           <div class="field-row">
-            <div class="field"><span class="prefix">+91</span><input type="tel" id="addr-phone" maxlength="10" placeholder="Mobile number" value="${customerPhone}"></div>
+            <div class="field"><span class="prefix">+91</span><input type="tel" id="addr-phone" maxlength="10" placeholder="Mobile number"></div>
           </div>
           <div class="field"><input type="text" id="addr-line1" placeholder="Flat / House no., Building, Street"></div>
           <div class="field"><input type="text" id="addr-line2" placeholder="Landmark (optional)"></div>
@@ -1844,7 +1782,7 @@
       items: grouped.map(m => ({ name: m.name, qty: m.qty, price: m.price })),
       total: grouped.reduce((sum,m) => sum + m.price*m.qty, 0),
       address: orderAddress,
-      customerContact: customerPhone ? ('+91 ' + customerPhone) : (customerEmail || 'Guest'),
+      customerContact: customerEmail || 'Guest',
       paymentLabel: methodName,
       status: 'new',
     };
